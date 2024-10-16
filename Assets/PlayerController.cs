@@ -9,14 +9,20 @@ public class PlayerController : MonoBehaviour
     public float walkSpeed;
     public float runSpeed;
     public float rotateSpeed;
-    public GameObject shootPoint;
-    public GameObject[] bullets;
+    public float jumpForce;
+    public LayerMask groundLayer;
+    public Camera cam;
 
     private Vector2 m_moveDir;
     private Vector2 m_rotateDir;
-    private bool isRunning;
-    private float moveSpeed;
-    private int useBulletIndex;
+    private bool m_isRunning;
+    private float m_moveSpeed;
+    
+    private float m_rotationX;
+    private Gun m_playerGun;
+    private int m_gunIndex;
+    private Rigidbody m_rb;
+    private bool m_isGrounded;
 
     public void OnMove(InputValue input)
     {
@@ -32,7 +38,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnRun(InputValue input)
     {
-        isRunning = input.isPressed;
+        m_isRunning = input.isPressed;
         // Debug.Log("IsRunning: " + isRunning);
     }
 
@@ -40,36 +46,63 @@ public class PlayerController : MonoBehaviour
     {
         if(input.isPressed)
         {
-            GameObject bullet = Instantiate(bullets[useBulletIndex]);
-            bullet.transform.position = shootPoint.transform.position;
-            bullet.transform.rotation = shootPoint.transform.rotation;
+            m_playerGun.Fire();
         }
     }
 
     public void OnBulletChange(InputValue input)
     {
-        useBulletIndex = (useBulletIndex + 1) % bullets.Length;
+        m_gunIndex++;
+        m_playerGun.gunType = ((GunType)(m_gunIndex % 2));
     }
 
-    void Awake()
+    public void OnJump(InputValue input)
+    {
+        if(input.isPressed && m_isGrounded)
+        {
+            m_rb.AddRelativeForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            m_isGrounded = false;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if ((1 << collision.gameObject.layer) == groundLayer)
+            m_isGrounded = true;
+    }
+
+    private void Init()
     {
         // Cursor
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
-        // Default bullet
-        useBulletIndex = 0;
-        if (bullets.Length == 0)
-            Debug.LogError("Player의 Bullets 필요함");
+        // Camera
+        cam = Camera.main;
+        cam.transform.localRotation = Quaternion.identity;
 
+        // Gun type
+        m_playerGun = GetComponent<Gun>();
+
+        // Rigidbody
+        m_rb = GetComponent<Rigidbody>();
+        m_isGrounded = true;
+    }
+
+    void Awake()
+    {
+        Init();
     }
 
     void FixedUpdate()
     {
-        moveSpeed = isRunning ? runSpeed : walkSpeed;
-        moveSpeed *= Time.deltaTime;
+        m_moveSpeed = m_isRunning ? runSpeed : walkSpeed;
+   
+        transform.Translate(m_moveDir.x * m_moveSpeed * Time.deltaTime, 0, m_moveDir.y * m_moveSpeed * Time.deltaTime);
 
-        transform.Translate(m_moveDir.x * moveSpeed, 0, m_moveDir.y * moveSpeed);
-        transform.Rotate(0, m_rotateDir.x * rotateSpeed * Time.deltaTime, 0);
+        transform.Rotate(0, m_rotateDir.x * rotateSpeed * Time.deltaTime, 0); // y축 회전(플레이어 자체)
+        m_rotationX += m_rotateDir.y * rotateSpeed * Time.deltaTime; // x축 회전(카메라만)
+        m_rotationX = Mathf.Clamp(m_rotationX, -90.0f, 90.0f);
+        cam.transform.localRotation = Quaternion.Euler(-m_rotationX, 0, 0);
     }
 }

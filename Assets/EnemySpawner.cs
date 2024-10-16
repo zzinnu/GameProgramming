@@ -30,10 +30,19 @@ public class EnemySpawner : MonoBehaviour
         spawnObject.transform.rotation = Quaternion.LookRotation((player.transform.position -  spawnPos).normalized);
     }
 
+
     void Start()
     {
+        WaveManager.Instance.AddWave(this);
+
         spawnAreaCollider = GetComponent<BoxCollider>();
         InvokeRepeating("Spawn", startTime, spawnRate);
-        Invoke("CancelInvoke", endTime);
+        Invoke("EndSpawn", endTime);
+    }
+
+    void EndSpawn()
+    {
+        WaveManager.Instance.RemoveWave(this);
+        CancelInvoke();
     }
 }

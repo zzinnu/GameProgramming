@@ -51,7 +51,7 @@ MonoBehaviour:
   - {fileID: 4563340133682503397, guid: f98e0d23332cddf4584226f4061037d6, type: 3}
   player: {fileID: 0}
   startTime: 0
-  endTime: 100
+  endTime: 10
   spawnRate: 1
 --- !u!65 &3990308813061236011
 BoxCollider:
@@ -72,5 +72,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 30, y: 1, z: 30}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 24.000912, y: 1, z: 33.699974}
+  m_Center: {x: -2.9995441, y: 0, z: 1.849987}

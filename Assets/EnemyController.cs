@@ -13,11 +13,12 @@ public class EnemyController : MonoBehaviour
     private Vector3 moveDir;
     private Quaternion lookRotation;
     private WaitForSeconds waitTime;
-
-    
+    private Rigidbody rb;
 
     void Start()
     {
+        rb = GetComponent<Rigidbody>();
+
         waitTime = new WaitForSeconds(decisionTime);
 
         Destroy(gameObject, destroyDelay);
@@ -26,11 +27,12 @@ public class EnemyController : MonoBehaviour
 
     void FixedUpdate()
     {
-        transform.Translate(moveDir.x * moveSpeed * Time.deltaTime,
-                            0.0f,
-                            moveDir.z * moveSpeed * Time.deltaTime,
-                            Space.World);
+        //transform.Translate(moveDir.x * moveSpeed * Time.deltaTime,
+        //                    0.0f,
+        //                    moveDir.z * moveSpeed * Time.deltaTime,
+        //                    Space.World);
 
+        rb.velocity = moveDir * moveSpeed;
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotateSpeed);
     }
 
