@@ -12,14 +12,14 @@ TagManager:
   - Environment
   - Water
   - UI
-  - 
+  - Ground
   - 
   - 
   - 
   - Player
   - Enemy
   - PlayerBullet
-  - 
+  - EnemyBullet
   - 
   - 
   - 

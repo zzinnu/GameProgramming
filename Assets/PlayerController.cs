@@ -38,7 +38,11 @@ public class PlayerController : MonoBehaviour
 
     public void OnRun(InputValue input)
     {
-        m_isRunning = input.isPressed;
+        if(GameManager.Instance.player.currentStamina > 10.0f)
+        {
+            GameManager.Instance.player.isUseStamina = input.isPressed;
+            m_isRunning = input.isPressed;
+        }
         // Debug.Log("IsRunning: " + isRunning);
     }
 
@@ -58,8 +62,10 @@ public class PlayerController : MonoBehaviour
 
     public void OnJump(InputValue input)
     {
-        if(input.isPressed && m_isGrounded)
+        if(input.isPressed && m_isGrounded && GameManager.Instance.player.currentStamina > 10.0f)
         {
+            GameManager.Instance.player.isUseStamina = true;
+            GameManager.Instance.player.currentStamina -= 10.0f;
             m_rb.AddRelativeForce(Vector3.up * jumpForce, ForceMode.Impulse);
             m_isGrounded = false;
         }
@@ -67,8 +73,13 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if ((1 << collision.gameObject.layer) == groundLayer)
+        LayerMask collisionLayer = 1 << collision.gameObject.layer;
+        if ((collisionLayer & groundLayer) == collisionLayer)
+        {
             m_isGrounded = true;
+            GameManager.Instance.player.isUseStamina = false;
+        }
+            
     }
 
     private void Init()
@@ -87,6 +98,7 @@ public class PlayerController : MonoBehaviour
         // Rigidbody
         m_rb = GetComponent<Rigidbody>();
         m_isGrounded = true;
+        
     }
 
     void Awake()
@@ -97,7 +109,17 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         m_moveSpeed = m_isRunning ? runSpeed : walkSpeed;
-   
+        if(m_isRunning)
+        {
+            if(GameManager.Instance.player.currentStamina < 0.0f)
+            {
+                m_isRunning = false;
+                GameManager.Instance.player.isUseStamina = false;
+            }
+
+            GameManager.Instance.player.currentStamina -= 0.1f;
+        }
+
         transform.Translate(m_moveDir.x * m_moveSpeed * Time.deltaTime, 0, m_moveDir.y * m_moveSpeed * Time.deltaTime);
 
         transform.Rotate(0, m_rotateDir.x * rotateSpeed * Time.deltaTime, 0); // y축 회전(플레이어 자체)

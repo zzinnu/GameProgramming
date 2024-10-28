@@ -19,13 +19,18 @@ public class GameManager : MonoBehaviour
             Debug.LogError("Already exists GameManager");
             Destroy(gameObject);
         }
-            
+    }
+
+    private void OnDestroy()
+    {
+        player.onDeath.RemoveListener(CheckLoseCondition);
+        EnemyManager.Instance.onChanged.RemoveListener(CheckWinCondition);
+        WaveManager.Instance.onChanged.RemoveListener(CheckWinCondition);
     }
 
     private void Start()
     {
         player.onDeath.AddListener(CheckLoseCondition);
-
         EnemyManager.Instance.onChanged.AddListener(CheckWinCondition);
         WaveManager.Instance.onChanged.AddListener(CheckWinCondition);
     }
