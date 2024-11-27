@@ -4,7 +4,13 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public float hp;
+    public Lifes enemyLifes;
+
+    private void Awake()
+    {
+        if (enemyLifes == null)
+            enemyLifes = GetComponent<Lifes>();
+    }
 
     void Start()
     {
@@ -14,5 +20,14 @@ public class Enemy : MonoBehaviour
     private void OnDestroy()
     {
         EnemyManager.Instance.RemoveEnemy(this);
+    }
+
+    private void Update()
+    {
+        // lifes가 0이 되면 사망
+        if (enemyLifes.lifes <= 0)
+        {
+            Destroy(gameObject);
+        }
     }
 }

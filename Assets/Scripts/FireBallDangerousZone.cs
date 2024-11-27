@@ -17,11 +17,12 @@ public class FireBallDangerousZone : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if(detectionCollision)
+        // Lifes TakeDamage
+        if (detectionCollision)
         {
             if((1 << other.gameObject.layer) == LayerMask.GetMask("Player"))
             {
-                other.gameObject.GetComponent<Player>().lifes -= damage;
+                other.GetComponent<Lifes>().TakeDamage(damage);
             }
         }
     }

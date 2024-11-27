@@ -12,16 +12,16 @@ public class PlayerController : MonoBehaviour
     public float jumpForce;
     public LayerMask groundLayer;
     public Camera cam;
+    public Rigidbody Rb { get; set; }
+    public bool IsRunning { get; set; }
 
     private Vector2 m_moveDir;
     private Vector2 m_rotateDir;
-    private bool m_isRunning;
+   
     private float m_moveSpeed;
-    
-    private float m_rotationX;
-    private Gun m_playerGun;
+   
     private int m_gunIndex;
-    private Rigidbody m_rb;
+    
     private bool m_isGrounded;
     private Player m_player;
 
@@ -59,29 +59,39 @@ public class PlayerController : MonoBehaviour
         {
             if(m_player.currentStamina > 10.0f)
             {
-                m_isRunning = true;
+                IsRunning = true;
                 m_player.isUseStamina = true;
+                m_player.gun.SetAnimParamDefault();
             }
         }
         else if (context.canceled)
         {
-            m_isRunning = false;
+            IsRunning = false;
             m_player.isUseStamina = false;
         }
     }
 
-    public void OnShoot(InputValue input)
+    public void OnShoot(InputAction.CallbackContext context)
     {
-        if(input.isPressed)
+        // 꾹 누르면 자동으로 발사, 땠을 때 발사 중지
+        // 달리고 있을땐 안됨
+        if (context.performed && !IsRunning)
         {
-            m_playerGun.Fire();
+            m_player.gun.IsRepeatFire = true;
+            StartCoroutine(m_player.gun.FireCoroutine());
+        }
+        else if(context.canceled)
+        {
+            m_player.gun.IsRepeatFire = false;
+            StopCoroutine(m_player.gun.FireCoroutine());
+            m_player.gun.anim.SetBool("Fire", false);
         }
     }
 
     public void OnBulletChange(InputValue input)
     {
         m_gunIndex++;
-        m_playerGun.gunType = ((GunType)(m_gunIndex % 2));
+        // m_playerGun.gunType = ((GunType)(m_gunIndex % 2));
     }
 
     public void OnJump(InputAction.CallbackContext context)
@@ -92,7 +102,7 @@ public class PlayerController : MonoBehaviour
         {
             m_player.isUseStamina = true;
             m_player.currentStamina -= 5.0f;
-            m_rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+            Rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
             m_isGrounded = false;
 
             Debug.Log("Jump");
@@ -110,6 +120,14 @@ public class PlayerController : MonoBehaviour
         }   
     }
 
+    public void OnReload(InputAction.CallbackContext context)
+    {
+        if(context.performed)
+        {
+            m_player.gun.Reload();
+        }
+    }
+
     private void Init()
     {
         // Cursor
@@ -120,11 +138,8 @@ public class PlayerController : MonoBehaviour
         cam = Camera.main;
         cam.transform.localRotation = Quaternion.identity;
 
-        // Gun type
-        m_playerGun = GetComponent<Gun>();
-
         // Rigidbody
-        m_rb = GetComponent<Rigidbody>();
+        Rb = GetComponent<Rigidbody>();
         m_isGrounded = true;
 
         // Player
@@ -139,16 +154,16 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        m_rb.drag = m_isGrounded ? m_moveDir.magnitude > 0 ? 5 : 20 : 2; // 땅에 있을 때는 이동 중이면 5, 아니면 20, 점프중일땐 2
+        Rb.drag = m_isGrounded ? m_moveDir.magnitude > 0 ? 5 : 20 : 2; // 땅에 있을 때는 이동 중이면 5, 아니면 20, 점프중일땐 2
 
         // Running 판단
         // Runnig일 경우 스태미나 감소, 0이하일 경우 Running 해제
-        m_moveSpeed = m_isRunning ? runSpeed : walkSpeed;
-        if(m_isRunning)
+        m_moveSpeed = IsRunning ? runSpeed : walkSpeed;
+        if(IsRunning)
         {
             if(m_player.currentStamina <= 0.0f)
             {
-                m_isRunning = false;
+                IsRunning = false;
                 m_player.isUseStamina = false;
             }
 
@@ -157,7 +172,7 @@ public class PlayerController : MonoBehaviour
 
         // 상대적인 이동 방향을 구하기 위해 TransformDirection 사용
         Vector3 relativeMovement = transform.TransformDirection(new Vector3(m_moveDir.x, 0, m_moveDir.y));
-        m_rb.AddForce(relativeMovement * m_moveSpeed, ForceMode.Impulse);
+        Rb.AddForce(relativeMovement * m_moveSpeed, ForceMode.Impulse);
 
         //m_rb.velocity = relativeMovement * m_moveSpeed;
 
@@ -166,6 +181,6 @@ public class PlayerController : MonoBehaviour
         // 카메라 y축 회전의 경우 부모 오브젝트가 이미 수행하므로, 카메라는 x축 회전만 진행
         transform.localRotation *= Quaternion.Euler(0, m_rotateDir.x * rotateSpeed * Time.deltaTime, 0);
         cam.transform.localRotation = Quaternion.Euler(cam.transform.localRotation.eulerAngles.x - m_rotateDir.y * rotateSpeed * Time.deltaTime, 0, 0);
-        Debug.Log(cam.transform.localRotation);
+        // Debug.Log(cam.transform.localRotation);
     }
 }

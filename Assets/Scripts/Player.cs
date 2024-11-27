@@ -5,20 +5,27 @@ using UnityEngine.Events;
 
 public class Player : MonoBehaviour
 {
-    public float lifes;
+    public Lifes playerLife;
     public float maxStamina;
     public float currentStamina;
     public bool isUseStamina;
     public UnityEvent onDeath;
 
+    public Gun gun;
+
     private void Awake()
     {
         currentStamina = maxStamina;
+        if (gun == null)
+            gun = GetComponentInChildren<Gun>();
+
+        if(playerLife == null)
+            playerLife = GetComponent<Lifes>();
     }
 
     private void FixedUpdate()
     {
-        if(lifes <= 0)
+        if(playerLife.lifes <= 0)
         {
             onDeath.Invoke();
             // Destroy(gameObject);

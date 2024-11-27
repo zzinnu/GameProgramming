@@ -30,9 +30,9 @@ public class BulletController : MonoBehaviour
 
             Debug.Log("Hit: " + hit.collider.name);
             Enemy enemy = hit.transform.GetComponent<Enemy>();
-            enemy.hp -= damage;
-            if(enemy.hp <= 0)
-                Destroy(hit.transform.gameObject);
+            //enemy.hp -= damage;
+            //if(enemy.hp <= 0)
+            //    Destroy(hit.transform.gameObject);
         }
     }
 }
