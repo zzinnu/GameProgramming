@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     public float rotateSpeed;
     public float jumpForce;
     public LayerMask groundLayer;
-    public Camera cam;
+    public GameObject cam;
     public Rigidbody Rb { get; set; }
     public bool IsRunning { get; set; }
 
@@ -27,6 +27,9 @@ public class PlayerController : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
+        if (GameManager.Instance.isPaused)
+            return;
+
         // 눌렀을 때만 이동할 수 있도록 canceled는 Vector2.zero로 초기화
         if (context.performed)
             m_moveDir = context.ReadValue<Vector2>();
@@ -36,7 +39,10 @@ public class PlayerController : MonoBehaviour
 
     public void OnRotate(InputAction.CallbackContext context)
     {
-        if(context.performed)
+        if (GameManager.Instance.isPaused)
+            return;
+
+        if (context.performed)
         {
             m_rotateDir = context.ReadValue<Vector2>();
 
@@ -55,7 +61,10 @@ public class PlayerController : MonoBehaviour
 
     public void OnRun(InputAction.CallbackContext context)
     {
-        if(context.performed)
+        if (GameManager.Instance.isPaused)
+            return;
+
+        if (context.performed)
         {
             if(m_player.currentStamina > 10.0f)
             {
@@ -73,17 +82,18 @@ public class PlayerController : MonoBehaviour
 
     public void OnShoot(InputAction.CallbackContext context)
     {
+        if (GameManager.Instance.isPaused)
+            return;
+
         // 꾹 누르면 자동으로 발사, 땠을 때 발사 중지
         // 달리고 있을땐 안됨
         if (context.performed && !IsRunning)
         {
-            m_player.gun.IsRepeatFire = true;
             StartCoroutine(m_player.gun.FireCoroutine());
         }
         else if(context.canceled)
         {
-            m_player.gun.IsRepeatFire = false;
-            StopCoroutine(m_player.gun.FireCoroutine());
+            StartCoroutine(m_player.gun.StopFireCoroutine());
             m_player.gun.anim.SetBool("Fire", false);
         }
     }
@@ -96,6 +106,9 @@ public class PlayerController : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (GameManager.Instance.isPaused)
+            return;
+
         // 점프는 스태미너 10 소모
         // 땅에 다시 착지할 때까지 점프 불가능
         if (context.performed && m_isGrounded && m_player.currentStamina > 5.0f)
@@ -104,6 +117,8 @@ public class PlayerController : MonoBehaviour
             m_player.currentStamina -= 5.0f;
             Rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
             m_isGrounded = false;
+
+            m_player.audioSources[1].PlayOneShot(m_player.jumpSound);
 
             Debug.Log("Jump");
         }
@@ -135,8 +150,8 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
 
         // Camera
-        cam = Camera.main;
-        cam.transform.localRotation = Quaternion.identity;
+        // cam = Camera.main;
+        // cam.transform.localRotation = Quaternion.identity;
 
         // Rigidbody
         Rb = GetComponent<Rigidbody>();
@@ -154,6 +169,9 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if(GameManager.Instance.isPaused)
+            return;
+
         Rb.drag = m_isGrounded ? m_moveDir.magnitude > 0 ? 5 : 20 : 2; // 땅에 있을 때는 이동 중이면 5, 아니면 20, 점프중일땐 2
 
         // Running 판단
@@ -179,8 +197,8 @@ public class PlayerController : MonoBehaviour
         // 회전
         // 몸체 회전이후 카메라 회전
         // 카메라 y축 회전의 경우 부모 오브젝트가 이미 수행하므로, 카메라는 x축 회전만 진행
-        transform.localRotation *= Quaternion.Euler(0, m_rotateDir.x * rotateSpeed * Time.deltaTime, 0);
-        cam.transform.localRotation = Quaternion.Euler(cam.transform.localRotation.eulerAngles.x - m_rotateDir.y * rotateSpeed * Time.deltaTime, 0, 0);
+        transform.localRotation *= Quaternion.Euler(0, m_rotateDir.x * rotateSpeed * Time.fixedDeltaTime, 0);
+        cam.transform.localRotation = Quaternion.Euler(cam.transform.localRotation.eulerAngles.x - m_rotateDir.y * rotateSpeed * Time.fixedDeltaTime, 0, 0);
         // Debug.Log(cam.transform.localRotation);
     }
 }

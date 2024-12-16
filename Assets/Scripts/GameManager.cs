@@ -7,8 +7,28 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    public Player player;
+    public WinOrLoseUI winOrLoseUI;
 
+    private Player m_player;
+
+    public Player Player 
+    {
+        get
+        {
+            if (m_player == null)
+            {
+                m_player = FindAnyObjectByType<Player>();
+            }
+
+            return m_player;
+        }
+
+        set
+        {
+            m_player = value;
+        }
+    }
+    public bool isPaused;
 
     private void Awake()
     {
@@ -23,28 +43,34 @@ public class GameManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        player.onDeath.RemoveListener(CheckLoseCondition);
-        EnemyManager.Instance.onChanged.RemoveListener(CheckWinCondition);
-        WaveManager.Instance.onChanged.RemoveListener(CheckWinCondition);
+        Player.onDeath.RemoveAllListeners();
+        EnemyManager.Instance.onChanged.RemoveAllListeners();
+        WaveManager.Instance.onChanged.RemoveAllListeners();
     }
 
     private void Start()
     {
-        player.onDeath.AddListener(CheckLoseCondition);
+        Player.onDeath.RemoveAllListeners();
+        Player.onDeath.AddListener(CheckLoseCondition);
+
+        EnemyManager.Instance.onChanged.RemoveAllListeners();
         EnemyManager.Instance.onChanged.AddListener(CheckWinCondition);
+
+        WaveManager.Instance.onChanged.RemoveAllListeners();
         WaveManager.Instance.onChanged.AddListener(CheckWinCondition);
     }
 
     void CheckLoseCondition()
     {
-        SceneManager.LoadScene("LoseScene");
+        if(Player.playerLife.CurrentLifes <= 0)
+            winOrLoseUI.onCalled.Invoke(false);
     }
 
     void CheckWinCondition()
     {
-        if(EnemyManager.Instance.enemyList.Count <= 0 && WaveManager.Instance.enemySpawnerList.Count <= 0)
+        if(EnemyManager.Instance.enemyList.Count <= 0 /*&& WaveManager.Instance.enemySpawnerList.Count <= 0*/)
         {
-            SceneManager.LoadScene("WinScene");
+            winOrLoseUI.onCalled.Invoke(true);
         }
     }
 }

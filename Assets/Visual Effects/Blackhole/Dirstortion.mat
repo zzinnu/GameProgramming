@@ -28,9 +28,9 @@ Material:
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
+  m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 3000
   stringTagMap: {}
   disabledShaderPasses:
   - MOTIONVECTORS
@@ -122,6 +122,7 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
+    - _CastShadows: 0
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -155,7 +156,9 @@ Material:
     - _TwirlStrength: 30
     - _Use_Gradient: 1
     - _WorkflowMode: 1
+    - _ZTest: 2
     - _ZWrite: 1
+    - _ZWriteControl: 0
     - _cutoff: 0
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}

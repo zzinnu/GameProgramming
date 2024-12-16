@@ -17,7 +17,7 @@ public class Enemy : MonoBehaviour
         EnemyManager.Instance.AddEnemy(this);
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         EnemyManager.Instance.RemoveEnemy(this);
     }
@@ -25,9 +25,9 @@ public class Enemy : MonoBehaviour
     private void Update()
     {
         // lifes가 0이 되면 사망
-        if (enemyLifes.lifes <= 0)
+        if (enemyLifes.CurrentLifes <= 0)
         {
-            Destroy(gameObject);
+            gameObject.SetActive(false);
         }
     }
 }

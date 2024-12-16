@@ -215,7 +215,7 @@ public class FenceLayoutEditor : Editor
 	public void OnEnable()
 	{
 		m_fenceLayout = target as FenceLayout;
-		m_terrains = FindObjectsOfType<Terrain>();
+		m_terrains = FindObjectsByType<Terrain>(FindObjectsSortMode.None);
 
 #if UNITY_2019_1_OR_NEWER
 		SceneView.duringSceneGui += InputUpdate;

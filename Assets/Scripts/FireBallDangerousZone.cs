@@ -7,7 +7,7 @@ public class FireBallDangerousZone : MonoBehaviour
 {
     // FireBall이 바닥과 충돌함
     public UnityEvent onCollided;
-    public float damage;
+    public int damage = 10;
     bool detectionCollision = false;
 
     void EnableCollisionDetection()
@@ -29,6 +29,7 @@ public class FireBallDangerousZone : MonoBehaviour
 
     private void Awake()
     {
+        onCollided.RemoveAllListeners();
         onCollided.AddListener(EnableCollisionDetection);
     }
 

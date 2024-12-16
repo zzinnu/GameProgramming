@@ -1,5 +1,12 @@
 fileFormatVersion: 2
 guid: 1b766da7cc2d648aa84e36cb5fe8abcb
+AssetOrigin:
+  serializedVersion: 1
+  productId: 66100
+  packageName: Fog of War Gun Sound FX Free
+  packageVersion: 1.0
+  assetPath: Assets/audio/guns/drum gun.wav
+  uploadId: 124889
 AudioImporter:
   externalObjects: {}
   serializedVersion: 7
@@ -13,7 +20,7 @@ AudioImporter:
     conversionMode: 0
     preloadAudioData: 0
   platformSettingOverrides: {}
-  forceToMono: 0
+  forceToMono: 1
   normalize: 1
   loadInBackground: 0
   ambisonic: 0
@@ -21,10 +28,3 @@ AudioImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 66100
-  packageName: Fog of War Gun Sound FX Free
-  packageVersion: 1.0
-  assetPath: Assets/audio/guns/drum gun.wav
-  uploadId: 124889

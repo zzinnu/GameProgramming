@@ -4,10 +4,16 @@ using UnityEngine;
 
 public class Lifes : MonoBehaviour
 {
-    public float lifes = 100.0f;
+    public int maxLifes = 100;
+    public int CurrentLifes { get; set; }
 
-    public void TakeDamage(float amount)
+    private void Awake()
     {
-        lifes -= amount;
+        CurrentLifes = maxLifes;
+    }
+
+    public void TakeDamage(int amount)
+    {
+        CurrentLifes -= amount;
     }
 }

@@ -154,6 +154,7 @@ MonoBehaviour:
     type: 3}
   impactPrefab: {fileID: 4470476564448276650, guid: a69dd488687407e4c9880ab0160bf528,
     type: 3}
+  power: 50
   dir: {x: 0, y: 0, z: 0}
 --- !u!1001 &7754581964856195378
 PrefabInstance:
